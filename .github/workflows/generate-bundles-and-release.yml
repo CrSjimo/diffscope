@@ -65,17 +65,12 @@ jobs:
               }
           }
 
-          Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe" -OutFile is.exe
-          Invoke-WebRequest -Uri "https://github.com/WhatTheBlock/innounp/releases/download/v0.50/innounp.exe" -OutFile innounp.exe
-          mkdir innosetup
-          ./innounp.exe -x -dinnosetup is.exe
-
           $env:SETUP_APP_NAME = $variableValues.CMAKE_PROJECT_NAME
           $env:SETUP_APP_VERSION = $variableValues.CMAKE_PROJECT_VERSION
           $env:SETUP_APP_INSTALLED_DIR = $env:DIFFSCOPE_INSTALLED_DIR
           $env:SETUP_APP_BRIDGE_ARTEFACTS_DIR = $env:DIFFSCOPE_BRIDGE_ARTEFACTS_DIR
 
-          &'./innosetup/{app}/ISCC.exe' scripts/setup/windows/setup.iss
+          ISCC.exe scripts/setup/windows/setup.iss
 
           Write-Output PACKAGE_PATH=$(Resolve-Path -Path scripts/setup/windows/Output/diffscope_setup.exe) >> $env:GITHUB_ENV
 
