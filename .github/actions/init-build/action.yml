@@ -23,7 +23,7 @@ runs:
         where.exe ninja
         ninja --version
         Write-Output VCPKG_TRIPLET=x64-windows >> $env:GITHUB_ENV
-        Write-Output VCPKG_TRIPLET_STATIC=x64-windows-static
+        Write-Output VCPKG_TRIPLET_STATIC=x64-windows-static >> $env:GITHUB_ENV
         Write-Output QT_ARCH=win64_msvc2019_64 >> $env:GITHUB_ENV
 
     - name: Install build tools (Ubuntu)
@@ -75,6 +75,8 @@ runs:
       shell: pwsh
       run: |
         cd vcpkg
+        $env:QT_DIR=$env:Qt5_DIR
+        $env:VCPKG_KEEP_ENV_VARS="QT_DIR;Qt5_DIR"
         ./vcpkg install `
           --x-manifest-root=${{ github.workspace }}/scripts/vcpkg-manifest `
           --x-install-root=./installed `
