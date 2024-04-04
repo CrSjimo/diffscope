@@ -74,6 +74,7 @@ runs:
     - name: Install vcpkg dependencies
       shell: pwsh
       run: |
+        cd vcpkg
         ./vcpkg install `
           --x-manifest-root=${{ github.workspace }}/scripts/vcpkg-manifest `
           --x-install-root=./installed `
