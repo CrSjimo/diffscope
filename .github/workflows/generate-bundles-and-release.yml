@@ -76,7 +76,7 @@ jobs:
 
           cd scripts/setup/windows
           ISCC.exe setup.iss
-          Rename-Item Output/diffscope_setup.exe Output/diffscope-${{ env.VCPKG_TRIPLET }}-${{ github.ref_name }}.exe
+          Rename-Item Output/diffscope_setup.exe diffscope-${{ env.VCPKG_TRIPLET }}-${{ github.ref_name }}.exe
           Write-Output PACKAGE_PATH=$(Resolve-Path -Path Output/diffscope-${{ env.VCPKG_TRIPLET }}-${{ github.ref_name }}.exe) >> $env:GITHUB_ENV
 
       - name: Create DMG bundle (macOS)
