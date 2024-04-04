@@ -54,9 +54,8 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
-          $InnoSetupLanguagesDir = Join-Path -Path $(Split-Path -Parent $(Get-Command ISCC.exe).Source) -ChildPath Languages
-          Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/jrsoftware/issrc/f59a90485af28067626e60ef7e42336e00ae7472/Files/Languages/Unofficial/ChineseSimplified.isl' -OutFile $InnoSetupLanguagesDir/ChineseSimplified.isl
-          Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/jrsoftware/issrc/e5e138e67bacd650650eac489fa861274a4b81ce/Files/Languages/Unofficial/ChineseTraditional.isl' -OutFile $InnoSetupLanguagesDir/ChineseTraditional.isl
+          Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/jrsoftware/issrc/f59a90485af28067626e60ef7e42336e00ae7472/Files/Languages/Unofficial/ChineseSimplified.isl' -OutFile ChineseSimplified.isl
+          Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/jrsoftware/issrc/e5e138e67bacd650650eac489fa861274a4b81ce/Files/Languages/Unofficial/ChineseTraditional.isl' -OutFile ChineseTraditional.isl
           $content = Get-Content build/CMakeCache.txt
           $variableValues = @{}
           foreach ($line in $content) {
