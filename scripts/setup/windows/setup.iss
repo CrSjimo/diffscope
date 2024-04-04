@@ -29,6 +29,7 @@ DefaultDirName={autopf}\OpenVPI\{#MyAppName}
 ChangesAssociations=yes
 DisableProgramGroupPage=yes
 LicenseFile={#MyAppInstalledDir}\share\doc\DiffScope\license-en.txt
+InfoBeforeFile={#GetEnv("GPL3_LICENSE_PATH")}
 OutputBaseFilename=diffscope_setup
 Compression=lzma
 SolidCompression=yes
@@ -38,7 +39,7 @@ ArchitecturesInstallIn64BitMode=x64
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
-Name: "chinesetraditional"; MessageFile: "compiler:Languages\ChineseTraditional.isl"
+Name: "chinesetraditional"; MessagesFile: "compiler:Languages\ChineseTraditional.isl"
 Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 
 [Tasks]
