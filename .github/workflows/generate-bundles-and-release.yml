@@ -93,6 +93,6 @@ jobs:
       - name: Upload release file
         uses: actions/upload-artifact@v3
         with:
-          name: diffscope-${{ env.VCPKG_TRIPLET }}-${{ github.ref }}
+          name: diffscope-${{ env.VCPKG_TRIPLET }}-${{ github.ref_name }}
           path: ${{ env.PACKAGE_PATH }}
 
