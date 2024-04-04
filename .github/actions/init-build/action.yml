@@ -36,7 +36,7 @@ runs:
         Write-Output VCPKG_TRIPLET_STATIC=x64-linux >> $env:GITHUB_ENV
         Write-Output QT_ARCH=gcc_64 >> $env:GITHUB_ENV
 
-    - name: Install build tools (MacOS)
+    - name: Install build tools (macOS)
       if: inputs.os == 'macos-latest'
       shell: pwsh
       env:
