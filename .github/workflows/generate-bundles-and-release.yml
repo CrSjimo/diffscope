@@ -35,7 +35,7 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=installed
           cmake --build build --target all
           cmake --build build --target install
-          Write-Output DIFFSCOPE_INSTALLED_DIR=$(Resolve-Path -Path build/installed) >> $env:GITHUB_ENV
+          Write-Output DIFFSCOPE_INSTALLED_DIR=$(Resolve-Path -Path installed) >> $env:GITHUB_ENV
 
       - name: Build DiffScope Bridge
         shell: pwsh
