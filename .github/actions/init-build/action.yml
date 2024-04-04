@@ -53,7 +53,7 @@ runs:
       uses: jurplel/install-qt-action@v3
       with:
         version: '5.15.2'
-        archives: ${{ inputs.os == 'ubuntu-latest' && 'icu qtbase' || 'qtbase' }}
+        archives: ${{ inputs.os == 'ubuntu-latest' && 'icu qtbase' || 'qtbase' }} qtsvg qtdeclarative qtremoteobjects
         cache: true
 
     - name: Restore vcpkg from cache
