@@ -61,7 +61,9 @@ runs:
       uses: actions/cache/restore@v3
       with:
         path: ${{ github.workspace }}/vcpkg
-        key: ${{ runner.os }}-vcpkg
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
+        restore-keys: |
+          ${{ runner.os }}-vcpkg
 
     - name: Clone and bootstrap vcpkg if cache misses
       if: steps.cache_vcpkg.outputs.cache-hit != 'true'
@@ -83,7 +85,7 @@ runs:
           --triplet=${{ env.VCPKG_TRIPLET }}
         ./vcpkg install `
           --x-manifest-root=${{ github.workspace }}/scripts/setup/diffscope-bridge `
-          --x-install-root=./installed `
+          --x-install-root=./bridge_installed `
           --triplet=${{ env.VCPKG_TRIPLET_STATIC }}
         Remove-Item -Path buildtrees -Recurse -Force
         Remove-Item -Path downloads -Recurse -Force
@@ -93,9 +95,7 @@ runs:
       uses: actions/cache/save@v3
       with:
         path: ${{ github.workspace }}/vcpkg
-        key: ${{ runner.os }}-vcpkg-${{ github.run_id }}
-        restore-keys: |
-          ${{ runner.os }}-vcpkg
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
 
     - name: Restore ASIO SDK from cache
       id: cache_asiosdk

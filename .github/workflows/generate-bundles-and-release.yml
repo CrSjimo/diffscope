@@ -43,7 +43,9 @@ jobs:
           cd scripts/setup/diffscope-bridge
           cmake -B build -G Ninja `
             -DCMAKE_BUILD_TYPE=Release `
-            -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT_DIR }}/scripts/buildsystems/vcpkg.cmake"
+            -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT_DIR }}/scripts/buildsystems/vcpkg.cmake" `
+            -DVCPKG_INSTALLED_DIR="${{ env.VCPKG_ROOT_DIR }}/bridge_installed" `
+            -DVCPKG_MANIFEST_MODE:BOOL=OFF
           cmake --build build --target all
           Write-Output DIFFSCOPE_BRIDGE_ARTEFACTS_DIR=$(Resolve-Path -Path build/DiffScopeBridge_artefacts/Release) >> $env:GITHUB_ENV
 
