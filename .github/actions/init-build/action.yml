@@ -87,9 +87,15 @@ runs:
           --x-manifest-root=${{ github.workspace }}/scripts/setup/diffscope-bridge `
           --x-install-root=./bridge_installed `
           --triplet=${{ env.VCPKG_TRIPLET_STATIC }}
-        Remove-Item -Path buildtrees -Recurse -Force
-        Remove-Item -Path downloads -Recurse -Force
-        Remove-Item -Path packages -Recurse -Force
+        if (Test-Path -Path buildtrees) {
+          Remove-Item -Path buildtrees -Recurse -Force
+        }
+        if (Test-Path -Path downloads) {
+          Remove-Item -Path downloads -Recurse -Force
+        }
+        if (Test-Path -Path packages) {
+          Remove-Item -Path packages -Recurse -Force
+        }
 
     - name: Save vcpkg to cache
       uses: actions/cache/save@v3
