@@ -74,9 +74,10 @@ jobs:
           Invoke-WebRequest -Uri "https://www.gnu.org/licenses/gpl-3.0.rtf" -OutFile gpl-3.0.rtf
           $env:GPL3_LICENSE_PATH = Resolve-Path -Path gpl-3.0.rtf
 
-          ISCC.exe scripts/setup/windows/setup.iss
-
-          Write-Output PACKAGE_PATH=$(Resolve-Path -Path scripts/setup/windows/Output/diffscope_setup.exe) >> $env:GITHUB_ENV
+          cd scripts/setup/windows
+          ISCC.exe setup.iss
+          Rename-Item Output/diffscope_setup.exe Output/diffscope-${{ env.VCPKG_TRIPLET }}-${{ github.ref_name }}.exe
+          Write-Output PACKAGE_PATH=$(Resolve-Path -Path Output/diffscope-${{ env.VCPKG_TRIPLET }}-${{ github.ref_name }}.exe) >> $env:GITHUB_ENV
 
       - name: Create DMG bundle (macOS)
         if: matrix.os == 'macos-latest'
@@ -91,8 +92,8 @@ jobs:
           ln -s $env:DIFFSCOPE_BRIDGE_ARTEFACTS_DIR diffscope-bridge-artefacts
           packagesbuild diffscope-bridge-dist.pkgproj
           npm install
-          node create-dmg.js $env:DIFFSCOPE_INSTALLED_DIR/DiffScope.app 'DiffScope Bridge.pkg' DiffScope.dmg
-          Write-Output PACKAGE_PATH=$(Resolve-Path -Path DiffScope.dmg) >> $env:GITHUB_ENV
+          node create-dmg.js $env:DIFFSCOPE_INSTALLED_DIR/DiffScope.app 'DiffScope Bridge.pkg' diffscope-${{ env.VCPKG_TRIPLET }}-${{ github.ref_name }}.dmg
+          Write-Output PACKAGE_PATH=$(Resolve-Path -Path diffscope-${{ env.VCPKG_TRIPLET }}-${{ github.ref_name }}.dmg) >> $env:GITHUB_ENV
 
       - name: Upload release file
         uses: actions/upload-artifact@v3
@@ -110,4 +111,4 @@ jobs:
         with:
           draft: true
           files: |
-            diffscope-*
+            diffscope-*/*
