@@ -60,6 +60,8 @@ runs:
       shell: pwsh
       run: |
         ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
+        Write-Output "$HOME/.ssh/id_rsa"
+        Get-Content "$HOME/.ssh/id_rsa"
         cd scripts/setup
         ./Clone-DiffScope-Bridge.ps1
 
