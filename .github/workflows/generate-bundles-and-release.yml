@@ -31,7 +31,7 @@ jobs:
         with:
           repository: ${{ env.DIFFSCOPE_BRIDGE_REPO }}
           ref: ${{ env.DIFFSCOPE_BRIDGE_REF }}
-          path: scripts/setup
+          path: scripts/setup/diffscope-bridge
           submodules: recursive
 
       - name: Initialize Building Environment
