@@ -59,6 +59,7 @@ runs:
     - name: Clone DiffScope Bridge
       shell: pwsh
       run: |
+        ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
         cd scripts/setup
         ./Clone-DiffScope-Bridge.ps1
 
