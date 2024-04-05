@@ -12,7 +12,7 @@ jobs:
           Write-Output aaa >> diffscope.txt
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: diffscope-test
           path: diffscope.txt
