@@ -28,11 +28,11 @@ jobs:
 
       - name: Checkout DiffScope Bridge
         uses: actions/checkout@v4
-          with:
-            repository: ${{ env.DIFFSCOPE_BRIDGE_REPO }}
-            ref: ${{ env.DIFFSCOPE_BRIDGE_REF }}
-            path: scripts/setup
-            submodules: recursive
+        with:
+          repository: ${{ env.DIFFSCOPE_BRIDGE_REPO }}
+          ref: ${{ env.DIFFSCOPE_BRIDGE_REF }}
+          path: scripts/setup
+          submodules: recursive
 
       - name: Initialize Building Environment
         uses: ./.github/actions/init-build
