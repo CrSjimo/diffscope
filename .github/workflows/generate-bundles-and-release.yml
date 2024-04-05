@@ -19,6 +19,21 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Get DiffScope Bridge Target
+        shell: pwsh
+        run: |
+          $target = ./scripts/setup/Get-DiffScope-Bridge-Target.ps1
+          Write-Output DIFFSCOPE_BRIDGE_REPO=$($target.repository) >> $env:GITHUB_ENV
+          Write-Output DIFFSCOPE_BRIDGE_REF=$($target.ref) >> $env:GITHUB_ENV
+
+      - name: Checkout DiffScope Bridge
+        uses: actions/checkout@v4
+          with:
+            repository: ${{ env.DIFFSCOPE_BRIDGE_REPO }}
+            ref: ${{ env.DIFFSCOPE_BRIDGE_REF }}
+            path: scripts/setup
+            submodules: recursive
+
       - name: Initialize Building Environment
         uses: ./.github/actions/init-build
         with:

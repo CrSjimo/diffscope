@@ -56,14 +56,6 @@ runs:
         archives: ${{ inputs.os == 'ubuntu-latest' && 'icu qtbase' || 'qtbase' }} qtsvg qtdeclarative qtremoteobjects qttools
         cache: true
 
-    - name: Clone DiffScope Bridge
-      shell: pwsh
-      run: |
-        ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
-        ssh-add "$HOME/.ssh/id_rsa"
-        cd scripts/setup
-        ./Clone-DiffScope-Bridge.ps1
-
     - name: Restore vcpkg from cache
       id: cache_vcpkg
       uses: actions/cache/restore@v4
