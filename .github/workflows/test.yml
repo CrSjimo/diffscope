@@ -8,7 +8,7 @@ jobs:
     steps:
       - name: Create File
         shell: pwsh
-        runs: |
+        run: |
           Write-Output aaa >> diffscope.txt
 
       - name: Upload artifacts
