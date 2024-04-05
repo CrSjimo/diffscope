@@ -29,10 +29,10 @@ jobs:
         run: |
           cmake -B build -G Ninja `
             -DCMAKE_BUILD_TYPE=Release `
-            -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT_DIR }}/scripts/buildsystems/vcpkg.cmake `
+            -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT_DIR }}/scripts/buildsystems/vcpkg.cmake" `
             -DVCPKG_APPLOCAL_DEPS:BOOL=FALSE `
-            -DQMSETUP_APPLOCAL_DEPS_PATHS_DEBUG=${{ env.VCPKG_ROOT_DIR }}/installed/${{ env.VCPKG_TRIPLET }}/debug/${{ matrix.os == 'windows-latest' && 'bin' || 'lib' }} `
-            -DQMSETUP_APPLOCAL_DEPS_PATHS_RELEASE=${{ env.VCPKG_ROOT_DIR }}/installed/${{ env.VCPKG_TRIPLET }}/${{ matrix.os == 'windows-latest' && 'bin' || 'lib' }} `
+            -DQMSETUP_APPLOCAL_DEPS_PATHS_DEBUG="${{ env.VCPKG_ROOT_DIR }}/installed/${{ env.VCPKG_TRIPLET }}/debug/${{ matrix.os == 'windows-latest' && 'bin' || 'lib' }}" `
+            -DQMSETUP_APPLOCAL_DEPS_PATHS_RELEASE="${{ env.VCPKG_ROOT_DIR }}/installed/${{ env.VCPKG_TRIPLET }}/${{ matrix.os == 'windows-latest' && 'bin' || 'lib' }}" `
             -DCK_ENABLE_CONSOLE:BOOL=FALSE `
             -DCK_WIN_APPLOCAL_DEPS:BOOL=TRUE `
             -DTALCS_DEVICE_ENABLE_ASIO:BOOL=ON `
