@@ -45,7 +45,9 @@ jobs:
       - name: Build DiffScope Bridge
         shell: pwsh
         run: |
-          cd scripts/setup/diffscope-bridge
+          cd scripts/setup
+          ./Clone-DiffScope-Bridge.ps1
+          cd diffscope-bridge
           cmake -B build -G Ninja `
             -DCMAKE_BUILD_TYPE=Release `
             -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT_DIR }}/scripts/buildsystems/vcpkg.cmake" `
