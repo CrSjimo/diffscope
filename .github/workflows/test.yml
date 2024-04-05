@@ -1,0 +1,27 @@
+name: Test
+on:
+  push:
+
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create File
+        shell: pwsh
+        runs: |
+          Write-Output aaa >> diffscope.txt
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: diffscope-test
+          path: diffscope.txt
+
+      - name: Get artifacts
+        uses: actions/download-artifact@v4
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: |
+            diffscope-*/*
