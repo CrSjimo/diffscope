@@ -65,18 +65,17 @@ runs:
         restore-keys: |
           ${{ runner.os }}-vcpkg-
 
-    - name: Clone and bootstrap vcpkg if cache misses
-      if: steps.cache_vcpkg.outputs.cache-hit != 'true'
-      shell: pwsh
-      run: |
-        git clone https://github.com/microsoft/vcpkg.git
-        cd vcpkg
-        ${{ inputs.os == 'windows-latest' && './bootstrap-vcpkg.bat' || 'sh ./bootstrap-vcpkg.sh' }}
-
     - name: Install vcpkg dependencies
       shell: pwsh
       run: |
-        cd vcpkg
+        if (!(Test-Path vcpkg)) {
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          ${{ inputs.os == 'windows-latest' && './bootstrap-vcpkg.bat' || 'sh ./bootstrap-vcpkg.sh' }}
+        } else {
+          cd vcpkg
+          git pull origin master
+        }
         $env:QT_DIR=$env:Qt5_DIR
         $env:VCPKG_KEEP_ENV_VARS="QT_DIR;Qt5_DIR"
         ./vcpkg install `

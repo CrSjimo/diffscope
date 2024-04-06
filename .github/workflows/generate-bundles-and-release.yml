@@ -34,7 +34,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: scripts/setup/diffscope-bridge
-          key: ${{ matrix.os }}-diffscope-bridge-${{ env.DIFFSCOPE_BRIDGE_REPO }}-${{ env.DIFFSCOPE_BRIDGE_REF }}
+          key: ${{ runner.os }}-diffscope-bridge-${{ env.DIFFSCOPE_BRIDGE_REPO }}-${{ env.DIFFSCOPE_BRIDGE_REF }}
 
       - name: Checkout DiffScope Bridge
         uses: actions/checkout@v4
@@ -123,8 +123,8 @@ jobs:
 
           cd scripts/setup/windows
           ISCC.exe setup.iss
-          Rename-Item Output/diffscope_setup.exe $env:BINARY_NAME.exe
-          Write-Output PACKAGE_PATH=$(Resolve-Path -Path Output/$env:BINARY_NAME.exe) >> $env:GITHUB_ENV
+          Rename-Item Output/diffscope_setup.exe "$env:BINARY_NAME.exe"
+          Write-Output PACKAGE_PATH=$(Resolve-Path -Path "Output/$env:BINARY_NAME.exe") >> $env:GITHUB_ENV
 
       - name: Create DMG bundle (macOS)
         if: matrix.os == 'macos-latest'
@@ -139,8 +139,8 @@ jobs:
           ln -s $env:DIFFSCOPE_BRIDGE_ARTEFACTS_DIR diffscope-bridge-artefacts
           packagesbuild diffscope-bridge-dist.pkgproj
           npm install
-          node create-dmg.js $env:DIFFSCOPE_INSTALLED_DIR/DiffScope.app 'DiffScope Bridge.pkg' $env:BINARY_NAME.dmg
-          Write-Output PACKAGE_PATH=$(Resolve-Path -Path $env:BINARY_NAME.dmg) >> $env:GITHUB_ENV
+          node create-dmg.js $env:DIFFSCOPE_INSTALLED_DIR/DiffScope.app 'DiffScope Bridge.pkg' "$env:BINARY_NAME.dmg"
+          Write-Output PACKAGE_PATH=$(Resolve-Path -Path "$env:BINARY_NAME.dmg") >> $env:GITHUB_ENV
 
       - name: Upload release file
         uses: actions/upload-artifact@v4
