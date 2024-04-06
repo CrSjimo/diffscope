@@ -90,7 +90,12 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: scripts/setup/diffscope-bridge
-          key: ${{ matrix.os }}-diffscope-bridge-${{ env.DIFFSCOPE_BRIDGE_REPO }}-${{ env.DIFFSCOPE_BRIDGE_REF }}
+          key: ${{ runner.os }}-diffscope-bridge-${{ env.DIFFSCOPE_BRIDGE_REPO }}-${{ env.DIFFSCOPE_BRIDGE_REF }}
+
+      - name: Set binary name
+        shell: pwsh
+        run: |
+          Write-Output BINARY_NAME=diffscope-$('${{ env.VCPKG_TRIPLET }}'.replace('osx', 'macos'))-${{ github.ref_type == 'tag' && github.ref_name || github.sha }} >> $env:GITHUB_ENV
 
       - name: Create installer (Windows)
         if: matrix.os == 'windows-latest'
@@ -118,8 +123,8 @@ jobs:
 
           cd scripts/setup/windows
           ISCC.exe setup.iss
-          Rename-Item Output/diffscope_setup.exe diffscope-${{ env.VCPKG_TRIPLET }}-${{ github.ref_name }}.exe
-          Write-Output PACKAGE_PATH=$(Resolve-Path -Path Output/diffscope-${{ env.VCPKG_TRIPLET }}-${{ github.ref_name }}.exe) >> $env:GITHUB_ENV
+          Rename-Item Output/diffscope_setup.exe $env:BINARY_NAME.exe
+          Write-Output PACKAGE_PATH=$(Resolve-Path -Path Output/$env:BINARY_NAME.exe) >> $env:GITHUB_ENV
 
       - name: Create DMG bundle (macOS)
         if: matrix.os == 'macos-latest'
@@ -134,13 +139,13 @@ jobs:
           ln -s $env:DIFFSCOPE_BRIDGE_ARTEFACTS_DIR diffscope-bridge-artefacts
           packagesbuild diffscope-bridge-dist.pkgproj
           npm install
-          node create-dmg.js $env:DIFFSCOPE_INSTALLED_DIR/DiffScope.app 'DiffScope Bridge.pkg' diffscope-${{ env.VCPKG_TRIPLET }}-${{ github.ref_name }}.dmg
-          Write-Output PACKAGE_PATH=$(Resolve-Path -Path diffscope-${{ env.VCPKG_TRIPLET }}-${{ github.ref_name }}.dmg) >> $env:GITHUB_ENV
+          node create-dmg.js $env:DIFFSCOPE_INSTALLED_DIR/DiffScope.app 'DiffScope Bridge.pkg' $env:BINARY_NAME.dmg
+          Write-Output PACKAGE_PATH=$(Resolve-Path -Path $env:BINARY_NAME.dmg) >> $env:GITHUB_ENV
 
       - name: Upload release file
         uses: actions/upload-artifact@v4
         with:
-          name: diffscope-${{ env.VCPKG_TRIPLET }}-${{ github.ref_name }}
+          name: ${{ env.BINARY_NAME }}
           path: ${{ env.PACKAGE_PATH }}
   Release:
     runs-on: ubuntu-latest
