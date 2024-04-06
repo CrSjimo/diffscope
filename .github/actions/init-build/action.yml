@@ -1,19 +1,19 @@
 name: Initialize Building Environment
 description: Initialize Building Environment
 inputs:
-  platform:
-    description: Platform
+  os:
+    description: OS
     required: true
 
 runs:
   using: "composite"
   steps:
     - name: Setup devcmd
-      if: inputs.platform.runs-on == 'windows-latest'
+      if: inputs.os == 'windows-latest'
       uses: ilammy/msvc-dev-cmd@v1
 
     - name: Install build tools (Windows)
-      if: inputs.platform.runs-on == 'windows-latest'
+      if: inputs.os == 'windows-latest'
       shell: pwsh
       run: |
         if ((Get-Command "ninja.exe" -ErrorAction SilentlyContinue) -eq $null)
@@ -27,7 +27,7 @@ runs:
         Write-Output QT_ARCH=win64_msvc2019_64 >> $env:GITHUB_ENV
 
     - name: Install build tools (Ubuntu)
-      if: inputs.platform.runs-on == 'ubuntu-latest'
+      if: inputs.os == 'ubuntu-latest'
       shell: pwsh
       run: |
         sudo apt update
@@ -37,7 +37,7 @@ runs:
         Write-Output QT_ARCH=gcc_64 >> $env:GITHUB_ENV
 
     - name: Install build tools (macOS)
-      if: inputs.platform.runs-on == 'macos-latest'
+      if: inputs.os == 'macos-latest'
       shell: pwsh
       env:
         HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
@@ -53,7 +53,7 @@ runs:
       uses: jurplel/install-qt-action@v3
       with:
         version: '5.15.2'
-        archives: ${{ inputs.platform.runs-on == 'ubuntu-latest' && 'icu qtbase' || 'qtbase' }} qtsvg qtdeclarative qtremoteobjects qttools
+        archives: ${{ inputs.os == 'ubuntu-latest' && 'icu qtbase' || 'qtbase' }} qtsvg qtdeclarative qtremoteobjects qttools
         cache: true
 
     - name: Restore vcpkg from cache
@@ -61,9 +61,9 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}/vcpkg
-        key: ${{ inputs.platform.key }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
         restore-keys: |
-          ${{ inputs.platform.key }}-vcpkg-
+          ${{ runner.os }}-vcpkg-
 
     - name: Clone and bootstrap vcpkg if cache misses
       if: steps.cache_vcpkg.outputs.cache-hit != 'true'
@@ -71,7 +71,7 @@ runs:
       run: |
         git clone https://github.com/microsoft/vcpkg.git
         cd vcpkg
-        ${{ inputs.platform.runs-on == 'windows-latest' && './bootstrap-vcpkg.bat' || 'sh ./bootstrap-vcpkg.sh' }}
+        ${{ inputs.os == 'windows-latest' && './bootstrap-vcpkg.bat' || 'sh ./bootstrap-vcpkg.sh' }}
 
     - name: Install vcpkg dependencies
       shell: pwsh
@@ -101,18 +101,18 @@ runs:
       uses: actions/cache/save@v4
       with:
         path: ${{ github.workspace }}/vcpkg
-        key: ${{ inputs.platform.key }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
 
     - name: Restore ASIO SDK from cache
       id: cache_asiosdk
-      if: inputs.platform.runs-on == 'windows-latest'
+      if: inputs.os == 'windows-latest'
       uses: actions/cache/restore@v4
       with:
         path: ${{github.workspace}}/asiosdk
         key: asiosdk
 
     - name: Get ASIO SDK
-      if: inputs.platform.runs-on == 'windows-latest' && steps.cache_asiosdk.outputs.cache-hit != 'true'
+      if: inputs.os == 'windows-latest' && steps.cache_asiosdk.outputs.cache-hit != 'true'
       shell: pwsh
       run: |
         Invoke-WebRequest -Uri https://download.steinberg.net/sdk_downloads/asiosdk_2.3.3_2019-06-14.zip -OutFile $env:RUNNER_TEMP/asiosdk.zip
@@ -120,7 +120,7 @@ runs:
         Rename-Item -Path asiosdk_2.3.3_2019-06-14 -NewName asiosdk
 
     - name: Save ASIO SDK to cache
-      if: inputs.platform.runs-on == 'windows-latest' && steps.cache_asiosdk.outputs.cache-hit != 'true'
+      if: inputs.os == 'windows-latest' && steps.cache_asiosdk.outputs.cache-hit != 'true'
       uses: actions/cache/save@v4
       with:
         path: ${{github.workspace}}/asiosdk
@@ -132,14 +132,14 @@ runs:
         Write-Output VCPKG_ROOT_DIR=$(Resolve-Path -Path ./vcpkg) >> $env:GITHUB_ENV
 
     - name: Set ASIO SDK directory variable (Windows)
-      if: inputs.platform.runs-on == 'windows-latest'
+      if: inputs.os == 'windows-latest'
       shell: pwsh
       run: |
         mv asiosdk ..
         Write-Output ASIOSDK_DIR=$(Resolve-Path -Path ../asiosdk) >> $env:GITHUB_ENV
 
     - name: Set ASIO SDK directory variable (Non-Windows)
-      if: inputs.platform.runs-on != 'windows-latest'
+      if: inputs.os != 'windows-latest'
       shell: pwsh
       run: |
         Write-Output ASIOSDK_DIR= >> $env:GITHUB_ENV

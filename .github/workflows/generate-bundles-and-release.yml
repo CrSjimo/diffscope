@@ -12,25 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: 
-          - key: Windows
-            runs-on: windows-latest
-            architecture: x64
-            triplet: x64-windows
-            triplet-static: x64-windows-static
-          - key: macOS-x64
-            runs-on: macos-latest
-            architecture: x64
-            triplet: x64-osx
-            triplet-static: x64-osx
-          - key: macOS-arm64
-            runs-on: macos-latest
-            architecture: arm64
-            triplet: arm64-osx
-            triplet-static: arm64-osx
-        
+        os: [windows-latest, macos-latest]
     
-    runs-on: ${{ matrix.platform.runs-on }}
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
@@ -50,7 +34,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: scripts/setup/diffscope-bridge
-          key: ${{ matrix.key }}-diffscope-bridge-${{ env.DIFFSCOPE_BRIDGE_REPO }}-${{ env.DIFFSCOPE_BRIDGE_REF }}
+          key: ${{ matrix.os }}-diffscope-bridge-${{ env.DIFFSCOPE_BRIDGE_REPO }}-${{ env.DIFFSCOPE_BRIDGE_REF }}
 
       - name: Checkout DiffScope Bridge
         uses: actions/checkout@v4
@@ -64,7 +48,7 @@ jobs:
       - name: Initialize Building Environment
         uses: ./.github/actions/init-build
         with:
-          platform: ${{ matrix.platform }}
+          os: ${{ matrix.os }}
 
       - name: Build DiffScope
         shell: pwsh
@@ -73,8 +57,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release `
             -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT_DIR }}/scripts/buildsystems/vcpkg.cmake" `
             -DVCPKG_APPLOCAL_DEPS:BOOL=FALSE `
-            -DQMSETUP_APPLOCAL_DEPS_PATHS_DEBUG="${{ env.VCPKG_ROOT_DIR }}/installed/${{ env.VCPKG_TRIPLET }}/debug/${{ matrix.platform.runs-on == 'windows-latest' && 'bin' || 'lib' }}" `
-            -DQMSETUP_APPLOCAL_DEPS_PATHS_RELEASE="${{ env.VCPKG_ROOT_DIR }}/installed/${{ env.VCPKG_TRIPLET }}/${{ matrix.platform.runs-on == 'windows-latest' && 'bin' || 'lib' }}" `
+            -DQMSETUP_APPLOCAL_DEPS_PATHS_DEBUG="${{ env.VCPKG_ROOT_DIR }}/installed/${{ env.VCPKG_TRIPLET }}/debug/${{ matrix.os == 'windows-latest' && 'bin' || 'lib' }}" `
+            -DQMSETUP_APPLOCAL_DEPS_PATHS_RELEASE="${{ env.VCPKG_ROOT_DIR }}/installed/${{ env.VCPKG_TRIPLET }}/${{ matrix.os == 'windows-latest' && 'bin' || 'lib' }}" `
             -DCK_ENABLE_CONSOLE:BOOL=FALSE `
             -DCK_WIN_APPLOCAL_DEPS:BOOL=TRUE `
             -DTALCS_DEVICE_ENABLE_ASIO:BOOL=ON `
@@ -102,8 +86,15 @@ jobs:
         run: |
           Write-Output DIFFSCOPE_BRIDGE_ARTEFACTS_DIR=$(Resolve-Path -Path scripts/setup/diffscope-bridge/build/DiffScopeBridge_artefacts/Release) >> $env:GITHUB_ENV
 
+      - name: Save DiffScope Bridge to cache
+        id: cache_diffscope_bridge
+        uses: actions/cache/save@v4
+        with:
+          path: scripts/setup/diffscope-bridge
+          key: ${{ matrix.os }}-diffscope-bridge-${{ env.DIFFSCOPE_BRIDGE_REPO }}-${{ env.DIFFSCOPE_BRIDGE_REF }}
+
       - name: Create installer (Windows)
-        if: matrix.platform.runs-on == 'windows-latest'
+        if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
           Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/jrsoftware/issrc/f59a90485af28067626e60ef7e42336e00ae7472/Files/Languages/Unofficial/ChineseSimplified.isl' -OutFile ChineseSimplified.isl
@@ -132,7 +123,7 @@ jobs:
           Write-Output PACKAGE_PATH=$(Resolve-Path -Path Output/diffscope-${{ env.VCPKG_TRIPLET }}-${{ github.ref_name }}.exe) >> $env:GITHUB_ENV
 
       - name: Create DMG bundle (macOS)
-        if: matrix.platform.runs-on == 'macos-latest'
+        if: matrix.os == 'macos-latest'
         shell: pwsh
         run: |
           cd scripts/setup/macos
