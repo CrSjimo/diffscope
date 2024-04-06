@@ -1,4 +1,0 @@
-Write-Output @{
-    repository = 'CrSjimo/diffscope-bridge'
-    ref = '941f82380a833bc6aa04f57328b77e46d7caf5c9'
-}
