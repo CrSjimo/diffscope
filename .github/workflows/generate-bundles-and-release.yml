@@ -87,7 +87,6 @@ jobs:
           Write-Output DIFFSCOPE_BRIDGE_ARTEFACTS_DIR=$(Resolve-Path -Path scripts/setup/diffscope-bridge/build/DiffScopeBridge_artefacts/Release) >> $env:GITHUB_ENV
 
       - name: Save DiffScope Bridge to cache
-        id: cache_diffscope_bridge
         uses: actions/cache/save@v4
         with:
           path: scripts/setup/diffscope-bridge
