@@ -71,15 +71,6 @@ runs:
         key: ${{ runner.os }}-vcpkg-${{ env.VCPKG_REPO_REF }}-${{ env.VCPKG_CACHE_HASH }}
         restore-keys: |
           ${{ runner.os }}-vcpkg-${{ env.VCPKG_REPO_REF }}-
-    
-
-    - name: Checkout vcpkg
-      uses: actions/checkout@v4
-      with:
-        repository: microsoft/vcpkg
-        ref: ${{ env.VCPKG_REPO_REF }}
-        fetch-depth: 0
-        path: vcpkg
 
     - name: Install vcpkg dependencies
       shell: pwsh
@@ -87,8 +78,10 @@ runs:
         if (!(Test-Path $env:VCPKG_DEFAULT_BINARY_CACHE)) {
           mkdir $env:VCPKG_DEFAULT_BINARY_CACHE
         }
+        git clone https://github.com/microsoft/vcpkg.git
         cd vcpkg
         ${{ inputs.os == 'windows-latest' && './bootstrap-vcpkg.bat' || 'sh ./bootstrap-vcpkg.sh' }}
+        git checkout $env:VCPKG_REPO_REF
         $env:QT_DIR="$env:Qt5_DIR/lib/cmake/Qt5"
         $env:Qt5_DIR=$env:QT_DIR
         $env:VCPKG_KEEP_ENV_VARS="QT_DIR;Qt5_DIR"
