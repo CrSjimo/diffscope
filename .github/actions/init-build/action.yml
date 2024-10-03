@@ -108,28 +108,13 @@ runs:
         path: ${{ github.workspace }}/vcpkg
         key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
 
-    - name: Restore ASIO SDK from cache
-      id: cache_asiosdk
-      if: inputs.os == 'windows-latest'
-      uses: actions/cache/restore@v4
-      with:
-        path: ${{github.workspace}}/asiosdk
-        key: asiosdk
-
     - name: Get ASIO SDK
-      if: inputs.os == 'windows-latest' && steps.cache_asiosdk.outputs.cache-hit != 'true'
+      if: inputs.os == 'windows-latest'
       shell: pwsh
       run: |
         Invoke-WebRequest -Uri "https://raw.githubusercontent.com/CrSjimo/diffscope-ci-tools-mirror/refs/heads/main/asiosdk_2.3.3_2019-06-14.zip" -OutFile $env:RUNNER_TEMP/asiosdk.zip
         Expand-Archive -Path $env:RUNNER_TEMP/asiosdk.zip -DestinationPath $env:GITHUB_WORKSPACE
         Rename-Item -Path asiosdk_2.3.3_2019-06-14 -NewName asiosdk
-
-    - name: Save ASIO SDK to cache
-      if: inputs.os == 'windows-latest' && steps.cache_asiosdk.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
-      with:
-        path: ${{github.workspace}}/asiosdk
-        key: asiosdk
 
     - name: Set directory variables
       shell: pwsh

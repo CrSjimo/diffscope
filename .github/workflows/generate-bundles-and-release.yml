@@ -1,10 +1,6 @@
 name: Generate Bundles and Release
 on:
   push:
-    tags:
-      - "v*"
-  schedule:
-    - cron: '0 4 * * 1'
   workflow_dispatch:
 
 jobs:
@@ -14,8 +10,8 @@ jobs:
       matrix:
         os:
           - windows-latest
-          - ubuntu-latest
-          - macos-13
+#          - ubuntu-latest
+#          - macos-13
     
     runs-on: ${{ matrix.os }}
 
