@@ -1,10 +1,7 @@
 name: Generate Bundles and Release
 on:
   push:
-    tags:
-      - "v*"
-  schedule:
-    - cron: '0 4 * * 1'
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -14,8 +11,8 @@ jobs:
       matrix:
         os:
           - windows-latest
-          - ubuntu-latest
-          - macos-13
+#          - ubuntu-latest
+#          - macos-13
     
     runs-on: ${{ matrix.os }}
 
@@ -77,7 +74,7 @@ jobs:
         shell: pwsh
         if: steps.cache_diffscope_bridge.outputs.cache-hit != 'true'
         run: |
-          cd scripts/setup/diffscope-bridge
+          Set-Location scripts/setup/diffscope-bridge
           cmake -B build -G Ninja `
             -DCMAKE_BUILD_TYPE=Release `
             -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT_DIR }}/scripts/buildsystems/vcpkg.cmake" `
@@ -137,7 +134,7 @@ jobs:
         if: matrix.os == 'macos-13'
         shell: pwsh
         run: |
-          cd scripts/setup/macos
+          Set-Location scripts/setup/macos
           Invoke-WebRequest -Uri "https://raw.githubusercontent.com/CrSjimo/diffscope-ci-tools-mirror/refs/heads/main/Packages.dmg" -OutFile Packages.dmg
           mkdir Packages
           hdiutil attach -mountpoint Packages Packages.dmg
@@ -153,11 +150,11 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         shell: pwsh
         run: |
-          mv $env:DIFFSCOPE_INSTALLED_DIR DiffScope
+          Move-Item -Path $env:DIFFSCOPE_INSTALLED_DIR -Destination DiffScope
           mkdir "DiffScope Bridge"
           Invoke-WebRequest -Uri "https://raw.githubusercontent.com/CrSjimo/diffscope-ci-tools-mirror/refs/heads/main/gpl-3.0.rtf" -OutFile "DiffScope Bridge/gpl-3.0.rtf"
-          mv $env:DIFFSCOPE_BRIDGE_ARTEFACTS_DIR/VST3/*.vst3 "DiffScope Bridge"
-          mv $env:DIFFSCOPE_BRIDGE_ARTEFACTS_DIR/LV2/*.lv2 "DiffScope Bridge"
+          Move-Item -Path $env:DIFFSCOPE_BRIDGE_ARTEFACTS_DIR/VST3/*.vst3 -Destination "DiffScope Bridge"
+          Move-Item -Path $env:DIFFSCOPE_BRIDGE_ARTEFACTS_DIR/LV2/*.lv2 -Destination "DiffScope Bridge"
           tar --bzip2 -cf "$env:BINARY_NAME.tar.bz2" DiffScope "DiffScope Bridge"
           Write-Output PACKAGE_PATH=$(Resolve-Path -Path "$env:BINARY_NAME.tar.bz2") >> $env:GITHUB_ENV
 
