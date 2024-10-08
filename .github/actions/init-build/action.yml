@@ -1,19 +1,15 @@
-name: Initialize Building Environment
-description: Initialize Building Environment
-inputs:
-  os:
-    description: OS
-    required: true
+name: Initialize building environment
+description: Initialize building environment
 
 runs:
   using: "composite"
   steps:
     - name: Setup devcmd
-      if: inputs.os == 'windows-latest'
+      if: runner.os == 'Windows'
       uses: ilammy/msvc-dev-cmd@v1
 
     - name: Install build tools (Windows)
-      if: inputs.os == 'windows-latest'
+      if: runner.os == 'Windows'
       shell: pwsh
       run: |
         if ((Get-Command "ninja.exe" -ErrorAction SilentlyContinue) -eq $null)
@@ -27,7 +23,7 @@ runs:
         Write-Output QT_ARCH=win64_msvc2019_64 >> $env:GITHUB_ENV
 
     - name: Install build tools (Ubuntu)
-      if: inputs.os == 'ubuntu-latest'
+      if: runner.os == 'Linux'
       shell: pwsh
       run: |
         sudo apt update
@@ -41,7 +37,7 @@ runs:
         Write-Output QT_ARCH=gcc_64 >> $env:GITHUB_ENV
 
     - name: Install build tools (macOS)
-      if: inputs.os == 'macos-13'
+      if: runner.os == 'macOS'
       shell: pwsh
       env:
         HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
@@ -57,7 +53,7 @@ runs:
       uses: jurplel/install-qt-action@v3
       with:
         version: '5.15.2'
-        archives: ${{ inputs.os == 'ubuntu-latest' && 'icu qtbase' || 'qtbase' }} qtsvg qtdeclarative qtremoteobjects qttools
+        archives: ${{ runner.os == 'Linux' && 'icu qtbase' || 'qtbase' }} qtsvg qtdeclarative qtremoteobjects qttools
         cache: true
 
     - name: Prepare vcpkg
@@ -84,7 +80,7 @@ runs:
         }
         git clone https://github.com/microsoft/vcpkg.git
         cd vcpkg
-        ${{ inputs.os == 'windows-latest' && './bootstrap-vcpkg.bat' || 'sh ./bootstrap-vcpkg.sh' }}
+        ${{ runner.os == 'Windows' && './bootstrap-vcpkg.bat' || 'sh ./bootstrap-vcpkg.sh' }}
         git checkout $env:VCPKG_REPO_REF
         $env:QT_DIR="$env:Qt5_DIR/lib/cmake/Qt5"
         $env:Qt5_DIR=$env:QT_DIR
@@ -109,7 +105,7 @@ runs:
         key: ${{ runner.os }}-vcpkg-${{ env.VCPKG_REPO_REF }}-${{ env.VCPKG_CACHE_HASH }}
 
     - name: Get ASIO SDK
-      if: inputs.os == 'windows-latest'
+      if: runner.os == 'Windows'
       shell: pwsh
       run: |
         Invoke-WebRequest -Uri "https://raw.githubusercontent.com/CrSjimo/diffscope-ci-tools-mirror/refs/heads/main/asiosdk_2.3.3_2019-06-14.zip" -OutFile $env:RUNNER_TEMP/asiosdk.zip
@@ -122,14 +118,14 @@ runs:
         Write-Output VCPKG_ROOT_DIR=$(Resolve-Path -Path ./vcpkg) >> $env:GITHUB_ENV
 
     - name: Set ASIO SDK directory variable (Windows)
-      if: inputs.os == 'windows-latest'
+      if: runner.os == 'Windows'
       shell: pwsh
       run: |
         mv asiosdk ..
         Write-Output ASIOSDK_DIR=$(Resolve-Path -Path ../asiosdk) >> $env:GITHUB_ENV
 
     - name: Set ASIO SDK directory variable (Non-Windows)
-      if: inputs.os != 'windows-latest'
+      if: runner.os != 'Windows'
       shell: pwsh
       run: |
         Write-Output ASIOSDK_DIR= >> $env:GITHUB_ENV
