@@ -76,12 +76,19 @@ runs:
       shell: pwsh
       run: |
         if (!(Test-Path $env:VCPKG_DEFAULT_BINARY_CACHE)) {
-          mkdir $env:VCPKG_DEFAULT_BINARY_CACHE
+          New-Item $env:VCPKG_DEFAULT_BINARY_CACHE -ItemType directory
         }
         git clone https://github.com/microsoft/vcpkg.git
-        cd vcpkg
+        Set-Location vcpkg
         ${{ runner.os == 'Windows' && './bootstrap-vcpkg.bat' || 'sh ./bootstrap-vcpkg.sh' }}
         git checkout $env:VCPKG_REPO_REF
+        
+        #workaround for vcpkg-cmake to set build type to RelWithDebInfo
+        foreach ($file in "ports/vcpkg-cmake/vcpkg_cmake_configure.cmake", "ports/vcpkg-cmake/vcpkg_cmake_build.cmake") {
+          (Get-Content $file) -creplace "Release","RelWithDebInfo" | Out-File -Encoding ASCII $file
+        }
+        Copy-Item ports/vcpkg-cmake ${{ github.workspace }}/scripts/vcpkg/ports -Recurse
+        
         $env:QT_DIR="$env:Qt5_DIR/lib/cmake/Qt5"
         $env:Qt5_DIR=$env:QT_DIR
         $env:VCPKG_KEEP_ENV_VARS="QT_DIR;Qt5_DIR"
@@ -121,7 +128,7 @@ runs:
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
-        mv asiosdk ..
+        Move-Item asiosdk ..
         Write-Output ASIOSDK_DIR=$(Resolve-Path -Path ../asiosdk) >> $env:GITHUB_ENV
 
     - name: Set ASIO SDK directory variable (Non-Windows)

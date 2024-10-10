@@ -39,9 +39,9 @@ runs:
       if: runner.os == 'macOS'
       shell: pwsh
       run: |
-        cd scripts/setup/macos
+        Set-Location scripts/setup/macos
         Invoke-WebRequest -Uri "https://raw.githubusercontent.com/CrSjimo/diffscope-ci-tools-mirror/refs/heads/main/Packages.dmg" -OutFile Packages.dmg
-        mkdir Packages
+        New-Item Packages -ItemType directory
         hdiutil attach -mountpoint Packages Packages.dmg
         sudo installer -pkg 'Packages/Install Packages.pkg' -target /
         Invoke-WebRequest -Uri "https://raw.githubusercontent.com/CrSjimo/diffscope-ci-tools-mirror/refs/heads/main/gpl-3.0.rtf" -OutFile gpl-3.0.rtf
@@ -55,8 +55,8 @@ runs:
       if: runner.os == 'Linux'
       shell: pwsh
       run: |
-        cd scripts/setup/linux
-        mv $env:DIFFSCOPE_INSTALLED_DIR DiffScope
+        Set-Location scripts/setup/linux
+        Move-Item $env:DIFFSCOPE_INSTALLED_DIR DiffScope
 
         Push-Location DiffScope/lib
         # Just steal the exclude list of dynamic libraries from AppImage
@@ -72,11 +72,11 @@ runs:
         }
         Pop-Location
 
-        mkdir "DiffScope Bridge"
+        New-Item "DiffScope Bridge" -ItemType directory
         Invoke-WebRequest -Uri "https://raw.githubusercontent.com/CrSjimo/diffscope-ci-tools-mirror/refs/heads/main/gpl-3.0.rtf" -OutFile "DiffScope Bridge/gpl-3.0.rtf"
-        mv $env:DIFFSCOPE_BRIDGE_ARTEFACTS_DIR/VST3/*.vst3 "DiffScope Bridge"
-        mv $env:DIFFSCOPE_BRIDGE_ARTEFACTS_DIR/LV2/*.lv2 "DiffScope Bridge"
-        mv create-desktop-entry.sh DiffScope
-        mv remove-desktop-entry.sh DiffScope
+        Move-Item $env:DIFFSCOPE_BRIDGE_ARTEFACTS_DIR/VST3/*.vst3 "DiffScope Bridge"
+        Move-Item $env:DIFFSCOPE_BRIDGE_ARTEFACTS_DIR/LV2/*.lv2 "DiffScope Bridge"
+        Move-Item create-desktop-entry.sh DiffScope
+        Move-Item remove-desktop-entry.sh DiffScope
         tar --bzip2 -cf "$env:BINARY_NAME.tar.bz2" DiffScope "DiffScope Bridge" "Installation Guide.txt"
         Write-Output PACKAGE_PATH=$(Resolve-Path -Path "$env:BINARY_NAME.tar.bz2") >> $env:GITHUB_ENV

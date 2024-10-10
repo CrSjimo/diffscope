@@ -27,8 +27,8 @@ jobs:
       matrix:
         os:
           - windows-latest
-#          - ubuntu-latest
-#          - macos-13
+          - ubuntu-latest
+          - macos-13
     
     runs-on: ${{ matrix.os }}
 
@@ -85,7 +85,7 @@ jobs:
       - name: Build DiffScope Bridge
         if: steps.cache_diffscope_bridge.outputs.cache-hit != 'true'
         run: |
-          cd scripts/setup/diffscope-bridge
+          Set-Location scripts/setup/diffscope-bridge
           cmake -B build -G Ninja `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
             -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT_DIR }}/scripts/buildsystems/vcpkg.cmake" `
